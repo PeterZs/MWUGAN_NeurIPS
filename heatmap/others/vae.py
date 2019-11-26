@@ -14,17 +14,6 @@ parser.add_argument('--epochs', type=int, default=10, metavar='N',
 parser.add_argument('--log-interval', type=int, default=10, metavar='N',
                     help='how many batches to wait before logging training status')
 args = parser.parse_args()
-# torch.manual_seed(args.seed)
-import time
-time_base = 0
-def tik():
-    global time_base
-    time_base = time.time()
-    print("Start ticking")
-
-def tok(name="(undefined)"):
-    print("Time used in module {}: {}".format(name, time.time() - time_base))
-
 
 class VAE(nn.Module):
     def __init__(self):
@@ -48,7 +37,6 @@ class VAE(nn.Module):
     def decode(self, z):
         h3 = F.relu(self.fc3(z))
         return self.fc4(h3)
-        # return F.sigmoid(self.fc4(h3))
 
     def forward(self, x):
         mu, logvar = self.encode(x.view(-1, 2))
@@ -61,20 +49,13 @@ optimizer = optim.Adam(model.parameters(), lr=1e-3)
 from IPython import embed
 # Reconstruction + KL divergence losses summed over all elements and batch
 def loss_function(recon_x, x, mu, logvar):
-    #  log(s) + 0.5 * (((x - u)/s)**2)
-    # print(x.shape)
-    # print(mu.shape)
-    # print(logvar.shape)
-    # embed()
     MSE = torch.sum(((recon_x - x) ** 2))
-    # MSE = F.mse_loss(recon_x, x.view(-1, 2), reduction='sum')
 
     # see Appendix B from VAE paper:
     # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
     # https://arxiv.org/abs/1312.6114
     # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-    # print("BCE = {}, KLD = {}".format(BCE, KLD))
     return MSE + KLD
 
 
@@ -90,11 +71,8 @@ def train(epoch):
     batch_idx = 0
     while batch_idx * batch_size < dataset.n_data:
         data, _ = dataset.next_batch(batch_size, batch_size * batch_idx)
-        # embed()
-        # data = data / dataset.maxval
         optimizer.zero_grad()
         recon_batch, mu, logvar = model(data)
-        # logvar[logvar > 100.] = 100.
         loss = loss_function(recon_batch, data, mu, logvar)
         loss.backward()
         train_loss += loss.item()
@@ -110,7 +88,6 @@ def train(epoch):
           epoch, train_loss / len(dataset)))
 
 def train_vae():
-
     model.train()
     for epoch in range(1, args.epochs + 1):
         train(epoch)
@@ -122,7 +99,6 @@ def sample(model, n=125000):
     noise = nr.randn(n, 10)
     data = model.decode(torch.Tensor(noise))
     data = data.detach().numpy()
-    # return data * dataset.maxval
     return data
 
 if __name__ == "__main__":
@@ -132,9 +108,7 @@ if __name__ == "__main__":
     plt.scatter(dataset.data[:, 0], dataset.data[:, 1], alpha=0.01)
     plt.savefig("dataset.png")
     plt.clf()
-    tik()
     train_vae()
-    tok("Single VAE")
 
     samples = sample(model)
     import matplotlib.pyplot as plt
@@ -148,7 +122,5 @@ if __name__ == "__main__":
     samples[samples < -15] = -15
     samples = np.vstack((samples, np.array([[-15, -15], [15, 15]])))
     plt.hist2d(samples[:, 0], samples[:, 1], bins=(100, 100), cmap=plt.cm.jet)
-    # plt.title("VAE")
-    # plt.colorbar()
     plt.axis("off")
     plt.savefig("heatmap_vae.png", dpi=300)

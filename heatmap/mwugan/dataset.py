@@ -47,11 +47,6 @@ class StackedMNIST(Dataset):
             self.labels[i] = lb0 + 10*lb1 + 100*lb2
 
 
-        # ch0, lb0 = self.mnist_dataset[idx0]
-        # ch1, lb1 = self.mnist_dataset[idx1]
-        # ch2, lb2 = self.mnist_dataset[idx2]
-
-
     def __getitem__(self, index):
         return self.data[index,:,:,:], self.labels[index]
 
@@ -97,10 +92,6 @@ class FasionMNIST_MNIST(Dataset):
         assert(len(FS_label_count)==10)
         assert(len(MNIST_label_count)==10)
         
-        # n_fs_data = len(fashion_dataset)
-        # print(len(mnist_dataset))
-        # print(len(fashion_dataset))
-
         self.fs_size = np.sum(FS_label_count)
         self.mnist_size = np.sum(MNIST_label_count)
 
@@ -485,7 +476,6 @@ class Sine(Dataset):
         data = np.vstack((x, y)).T
         data = np.vstack((data, data2))
         data /= 1000.
-        # data[:, 1] -= 2000
 
         self.data = torch.FloatTensor(data)
         self.label = torch.LongTensor(np.zeros((uniform_num + outlier_num)))

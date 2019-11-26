@@ -10,32 +10,6 @@ class Outlier(Dataset):
         self.sig = sig
         self.isimg = False
 
-        """
-        self.modes = []
-        for y in modex:
-            for x in modex:
-                self.modes.append([y, x])
-
-        self.modes.append([100, 100])
-        self.modes = np.vstack(self.modes)
-
-        data = None
-        labels = []
-        for loc in range(len(self.modes)):
-            if data is None:
-                data = np.random.multivariate_normal((self.modes[loc, 0], self.modes[loc, 1]),
-                                                     cov=[[self.sig, 0], [0, self.sig]], size=num_per_mode)
-                labels.append(np.ones((num_per_mode, 1)) * loc)
-            else:
-                data = np.concatenate(
-                    [
-                        data,
-                        np.random.multivariate_normal((self.modes[loc, 0], self.modes[loc, 1]),
-                                                      cov=[[self.sig, 0], [0, self.sig]], size=num_per_mode)
-                    ]
-                )
-                labels.append(np.ones((num_per_mode, 1)) * loc)
-        """
         uniform_num = 100000
         data1 = np.random.uniform(-10000, 10000, size=(uniform_num, dim))
         labels = [0 for _ in range(uniform_num)]
@@ -45,7 +19,6 @@ class Outlier(Dataset):
         labels += [1 for _ in range(outlier_num)]
 
         data = np.vstack((data1, data2))
-        # data[:, 1] -= 2000
         data /= 2000
         self.data = torch.FloatTensor(data)
         self.label = torch.LongTensor(np.array(labels))
@@ -106,7 +79,6 @@ class Sine(Dataset):
         data = np.vstack((x, y)).T
         data = np.vstack((data, data2))
         data /= 1000.
-        # data[:, 1] -= 2000
         self.data = torch.FloatTensor(data)
         self.label = torch.LongTensor(np.zeros((uniform_num + outlier_num)))
         self.sample_weights = np.ones(len(self.label))

@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-#image aug
+
 def random_noise(imgs, sig):
     noise = torch.randn(imgs.shape)*sig
     return imgs + noise
@@ -67,8 +67,6 @@ def eval_all_from_folder(base, model, device, topk, startgan, endgan, n_batches,
                 top_data = insert_heap(top_data, element, topk, target)
 
     return top_data
-
-
 
 def insert_heap(heap, val, k, target):
     if val[1] != target:

@@ -4,7 +4,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 import vis
 
-
 def main():
     conf = {
         'gen_conf':{
@@ -31,9 +30,6 @@ def main():
     print(len(dataset))
 
     import importlib
-    # import vis
-    # vis = importlib.reload(vis)
-    # _ = vis.show2ddataset(dataset)
     import utils
     utils = importlib.reload(utils)
 
@@ -69,9 +65,6 @@ def main():
         return wanted, unwanted
 
     results = []
-    #for i in range(1, 25):
-    #    all_results = vis.show_synthetic_gan_all(mwugan.gan_list[:i], dataset)
-    #all_results = np.vstack(all_results)
     all_results = vis.show_synthetic_gan_all(mwugan.gan_list[:20], dataset)
     all_results = np.vstack(all_results)
     plt.clf()
@@ -81,10 +74,6 @@ def main():
     plt.hist2d(all_results[:, 0], all_results[:, 1], bins=(100, 100), cmap=plt.cm.jet)
     plt.savefig("heatmap.png")
 
-    embed()
-    #results.append(test_unwanted(dataset.modes, dataset.sig, all_results))
-
-    #return results, mwugan
     return None, mwugan
 
 def test_outlier_coverage(models):
@@ -113,4 +102,3 @@ if __name__ == "__main__":
         wanted, model = main()
         mult_results.append(wanted)
         models.append(model)
-    embed()

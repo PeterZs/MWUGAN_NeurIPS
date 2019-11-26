@@ -12,14 +12,12 @@ def show2ddataset(dataset, color='black', alpha=0.01):
         data = data.numpy()
     print(data.shape)
     plt.plot(data[:,0], data[:,1], 'o', color=color, alpha=alpha)
-    # plt.show()
 
 def show2dsinglegan(model, samples, alpha=0.1):
     latent_samples = model.sampler.sampling(samples)
     d_gen_input = latent_samples.to(dtype=torch.float32, device=model.device)
     d_fake_data = model.gen(d_gen_input)
     data = d_fake_data.detach().cpu().numpy()*100
-    # print(d_fake_data.shape)
     plt.plot(data[:,0], data[:,1], 'o', alpha=alpha)
 
 def show_synthetic_gan(model, dataset, num=5000):
@@ -62,7 +60,6 @@ def show_image_gan(model, n_row, n_col, normalize=True, ch=None):
     return show_img
 
 def showallimg(imgs, n_row, normalize=True):
-    # fig=plt.figure(figsize=(30, 30), dpi=20, facecolor='w', edgecolor='k')
     tmp = vutils.make_grid(imgs.to("cpu").detach(), padding=1, normalize=normalize, nrow=n_row)
     showimg(tmp)
     return tmp
@@ -74,9 +71,7 @@ def showimg(img):
     plt.show()
 
 def show_image_dataset(dataset, n_row, n_col, normalize=True, augment=False, labels=False):
-    # data = dataset.data
     n_show = n_row*n_col
-    # print(data.shape)
 
     show_img, lb = dataset.sample_batch(n_show)
     if labels:
@@ -84,9 +79,6 @@ def show_image_dataset(dataset, n_row, n_col, normalize=True, augment=False, lab
 
     if augment:
         show_img = utils.random_noise(show_img, 0.1)
-
-    # show_idx = np.random.choice(range(data.shape[0]), size=n_show, replace=False)
-    # show_img = data[show_idx,:,:,:]
 
     fig=plt.figure(figsize=(30, 30), dpi=20, facecolor='w', edgecolor='k')
     if isinstance(show_img, np.ndarray):
@@ -102,7 +94,6 @@ def show_topk(element, show_size, normalize=True):
         show_img = torch.zeros(show_size, 1, 32, 32)
         for j in range(show_size):
             show_img[j,:,:,:] = element[idx][0]
-            # (imgs[k,:,:,:], preds[k].item(), prob_max[k].item(), i, j, k)
             print('prediction', element[idx][1], 'probabitliy max', element[idx][2], 'gan id', element[idx][3], 'batch id', element[idx][4])
             idx += 1
         showimg(vutils.make_grid(show_img.to("cpu").detach(), padding=1, normalize=normalize, nrow=5))

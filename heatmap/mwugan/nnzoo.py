@@ -15,9 +15,6 @@ class Generator_gan(nn.Module):
         self.z_dim = input_size
 
     def forward(self, x):
-        # x = F.leaky_relu(self.map1(x), 0.5)
-        # x = F.leaky_relu(self.map2(x), 0.5)
-
         x = F.relu(self.map1(x))
         x = F.relu(self.map2(x))
         return self.map3(x)
@@ -31,14 +28,9 @@ class Discriminator_gan(nn.Module):
         self.map3 = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
-        # x = F.leaky_relu(self.map1(x), 0.5)
-        # x = F.leaky_relu(self.map2(x), 0.5)
-
         x = F.relu(self.map1(x))
         x = F.relu(self.map2(x))
         return torch.sigmoid(self.map3(x))
-
-
 
 
 def normal_init(m, mean, std):
@@ -59,8 +51,6 @@ class Generator_dcgan(nn.Module):
         self.deconv2_bn = nn.BatchNorm2d(d*4)
         self.deconv3 = nn.ConvTranspose2d(d*4, d*2, 4, 2, 1)
         self.deconv3_bn = nn.BatchNorm2d(d*2)
-        # self.deconv4 = nn.ConvTranspose2d(d*2, d, 4, 2, 1)
-        # self.deconv4_bn = nn.BatchNorm2d(d)
         self.deconv5 = nn.ConvTranspose2d(d*2, channel, 4, 2, 1)
         self.weight_init(0, 0.02)
 
@@ -71,17 +61,10 @@ class Generator_dcgan(nn.Module):
 
     # forward method
     def forward(self, input):
-        # x = F.relu(self.deconv1(input))
         x = F.relu(self.deconv1_bn(self.deconv1(input)))
-        # print('deconv1', x.shape)
         x = F.relu(self.deconv2_bn(self.deconv2(x)))
-        # print('deconv2', x.shape)
         x = F.relu(self.deconv3_bn(self.deconv3(x)))
-        # print('deconv3', x.shape)
-        # x = F.relu(self.deconv4_bn(self.deconv4(x)))
         x = torch.tanh(self.deconv5(x))
-        # print('deconv4', x.shape)
-
 
         return x
 
@@ -102,12 +85,7 @@ class Generator_dcgan_adastyle(nn.Module):
         self.deconv1_bn = nn.BatchNorm2d(d*8)                       # [batch_size, d * 8, 16, 16]
         self.deconv2 = nn.ConvTranspose2d(d*8, d*4, 2, stride=2, padding=1)
         self.deconv2_bn = nn.BatchNorm2d(d*4)                       # [batch_size, d * 4, 32, 32]
-        # self.deconv3 = nn.ConvTranspose2d(d*4, d*2, 4, stride=2, padding=1)
-        # self.deconv3_bn = nn.BatchNorm2d(d*2)
-        # self.deconv4 = nn.ConvTranspose2d(d*2, d, 4, 2, 1)
-        # self.deconv4_bn = nn.BatchNorm2d(d)
         self.deconv5 = nn.ConvTranspose2d(d*4, channel, 1, stride=1, padding=0)
-        # self.deconv5_bn = nn.BatchNorm2d(channel)                   # [batch_size, channel, 32, 32]
         self.weight_init(0, 0.02)
 
     # weight_init
@@ -117,22 +95,11 @@ class Generator_dcgan_adastyle(nn.Module):
 
     # forward method
     def forward(self, input):
-        # x = F.relu(self.deconv1(input))
-        # print(input.shape)
         x = self.linear(input.view(-1, self.dim_in)).view(-1, self.d * 16, 4, 4)
         x = F.leaky_relu(self.deconv0_bn(x))
-        # print(x.shapej)
         x = F.leaky_relu(self.deconv1_bn(self.deconv1(x)), 0.3)
-        # print(x.shape)
-        # print('deconv1', x.shape)
         x = F.leaky_relu(self.deconv2_bn(self.deconv2(x)), 0.3)
-        # print(x.shape)
-        # print('deconv2', x.shape)
-        # x = F.leaky_relu(self.deconv3_bn(self.deconv3(x)), 0.3)
-        # print('deconv3', x.shape)
-        # x = F.relu(self.deconv4_bn(self.deconv4(x)))
         x = torch.tanh(self.deconv5(x))
-        # print('deconv4', x.shape)
 
         return x
 
@@ -146,8 +113,6 @@ class Discriminator_dcgan(nn.Module):
         self.conv2_bn = nn.BatchNorm2d(d*2)
         self.conv3 = nn.Conv2d(d*2, d*4, 4, 2, 1)
         self.conv3_bn = nn.BatchNorm2d(d*4)
-        # self.conv4 = nn.Conv2d(d*4, d*8, 4, 2, 1)
-        # self.conv4_bn = nn.BatchNorm2d(d*8)
         self.conv5 = nn.Conv2d(d*4, 1, 4, 1, 0)
         self.weight_init(0, 0.02)
         self.wgan = wgan
@@ -160,18 +125,9 @@ class Discriminator_dcgan(nn.Module):
     # forward method
     def forward(self, input):
         x = F.leaky_relu(self.conv1(input))
-        # print('conv1', x.shape)
         x = F.leaky_relu(self.conv2_bn(self.conv2(x)))
-        # print('conv2', x.shape)
         x = F.leaky_relu(self.conv3_bn(self.conv3(x)))
-        # print('conv3', x.shape)
-        # x = F.leaky_relu(self.conv4_bn(self.conv4(x)), 0.2)
-        # print('conv4', x.shape)
-        # if self.wgan:
-            # return x
-
         x = torch.sigmoid(self.conv5(x))
-        # print('conv5', x.shape)
 
         return x
 
@@ -187,9 +143,6 @@ class Discriminator_dcgan_adastyle(nn.Module):
         self.conv2_bn = nn.BatchNorm2d(d*2)
         self.conv3 = nn.Conv2d(d*2, d*4, 2, stride=2, padding=0)
         self.conv3_bn = nn.BatchNorm2d(d*4)
-        # self.conv4 = nn.Conv2d(d*4, d*8, 2, stride=2, padding=0)
-        # self.conv4_bn = nn.BatchNorm2d(d*8)
-        # self.conv5 = nn.Conv2d(d*4, 1, 4, 1, 0)
         self.linear = nn.Linear(d * 4 * (4 * 4), 1)
         self.weight_init(0, 0.02)
         self.wgan = wgan
@@ -202,18 +155,11 @@ class Discriminator_dcgan_adastyle(nn.Module):
     # forward method
     def forward(self, input):
         x = F.leaky_relu(self.conv1_bn(self.conv1(input)), 0.3)
-        # print('conv1', x.shape)
         x = F.leaky_relu(self.conv2_bn(self.conv2(x)), 0.3)
-        # print('conv2', x.shape)
         x = F.leaky_relu(self.conv3_bn(self.conv3(x)), 0.3)
-        # print('conv3', x.shape)
-        # x = F.leaky_relu(self.conv4_bn(self.conv4(x)), 0.2)
-        # print('conv4', x.shape)
         if self.wgan:
             return x
-        #print(x.shape)
         x = torch.sigmoid(self.linear(x.view(-1, self.d * 4 * (4 * 4))))
-        # print('conv5', x.shape)
 
         return x
 
@@ -243,7 +189,6 @@ class Generator_dcgan64(nn.Module):
 
     # forward method
     def forward(self, input):
-        # x = F.relu(self.deconv1(input))
         x = F.relu(self.deconv1_bn(self.deconv1(input)))
         x = F.relu(self.deconv2_bn(self.deconv2(x)))
         x = F.relu(self.deconv3_bn(self.deconv3(x)))
@@ -285,12 +230,9 @@ class Discriminator_dcgan64(nn.Module):
         return x
 
 
-
-
 class MNISTClassifier(nn.Module):
     def __init__(self, input_channel=1, hidden_channel=128):
         super(MNISTClassifier, self).__init__()
-        # self.conv1 = nn.Conv2d(input_channel, hidden_channel, 4, 2, 1)
         self.conv2 = nn.Conv2d(input_channel, hidden_channel * 2, 4, 2, 1)
         self.conv2_bn = nn.BatchNorm2d(hidden_channel * 2)
         self.conv3 = nn.Conv2d(hidden_channel * 2, hidden_channel * 4, 4, 2, 1)
@@ -300,7 +242,6 @@ class MNISTClassifier(nn.Module):
         self.conv5 = nn.Conv2d(hidden_channel * 8, 1, 4, 1, 0)
 
     def forward(self, input):
-        # x = F.leaky_relu(self.conv1(input), 0.2)
         x = F.relu(self.conv2_bn(self.conv2(input)))
         x = F.relu(self.conv3_bn(self.conv3(x)))
         x = F.relu(self.conv4_bn(self.conv4(x)))
